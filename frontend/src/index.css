@@ -25,9 +25,17 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  justify-content: center;
+  align-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #f8fafc; /* Standardizing background */
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 h1 {
