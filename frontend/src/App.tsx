@@ -64,7 +64,8 @@ function ComparisonTool() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8001/calculate', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+      const response = await axios.post(`${apiUrl}/calculate`, {
         comparisons: flattened
       });
       setResults(response.data);
