@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { laptopService } from '../api/laptopService';
 import type { Laptop, LaptopCreate } from '../types';
 
 export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [laptops, setLaptops] = useState<Laptop[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingLaptop, setEditingLaptop] = useState<Laptop | null>(null);
@@ -123,6 +125,16 @@ export const AdminDashboard: React.FC = () => {
           background-color: #f8fafc;
         }
       `}</style>
+
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', marginBottom: '20px' }}>
+        <button 
+          onClick={() => navigate('/')}
+          className="secondary-btn"
+          style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          ← Back
+        </button>
+      </div>
 
       <div className="card" style={{ border: '1px solid var(--border)', marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
