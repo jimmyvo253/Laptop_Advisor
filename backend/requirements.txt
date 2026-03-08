@@ -9,3 +9,4 @@ python-dotenv
 numpy
 psycopg2-binary
 alembic
+bcrypt==4.0.1
