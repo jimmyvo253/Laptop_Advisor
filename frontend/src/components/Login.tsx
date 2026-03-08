@@ -23,7 +23,8 @@ export function Login({ onLogin }: LoginProps) {
       formData.append('username', email);
       formData.append('password', password);
 
-      const response = await axios.post('http://localhost:8001/auth/login', formData);
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${apiUrl}/auth/login`, formData);
       console.log("Login Response Data:", response.data);
       
       const { access_token, role } = response.data;
