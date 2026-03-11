@@ -70,6 +70,7 @@ function ComparisonTool() {
       const response = await axios.post(`${apiUrl}/calculate`, {
         comparisons: flattened
       });
+      console.log("Ranking Results Data:", response.data);
       setResults(response.data);
       setCurrentPage(1);
       setStep(2);
@@ -276,12 +277,12 @@ function ComparisonTool() {
                         <tr key={item.name}>
                           <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{originalRank}</td>
                           <td style={{ fontWeight: '600' }}>{item.name}</td>
-                          <td>{item.performance}</td>
-                          <td>{item.resolution}</td>
-                          <td>{item.capacity}</td>
-                          <td>{item.portability}</td>
-                          <td>{item.battery}</td>
-                          <td>{Number(item.price).toLocaleString()}</td>
+                          <td>{item.performance ?? '-'}</td>
+                          <td>{item.resolution ?? '-'}</td>
+                          <td>{item.capacity ?? '-'}</td>
+                          <td>{item.portability ?? '-'}</td>
+                          <td>{item.battery ?? '-'}</td>
+                          <td>{item.price ? Number(item.price).toLocaleString() : '-'}</td>
                           <td style={{ fontWeight: 'bold', color: '#4f46e5' }}>{(item.score * 100).toFixed(1)}%</td>
                         </tr>
                       );

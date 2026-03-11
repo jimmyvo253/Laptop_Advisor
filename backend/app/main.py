@@ -14,7 +14,9 @@ app = FastAPI(title=settings.PROJECT_NAME)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://laptop-advisor-ruddy.vercel.app"
+        "https://laptop-advisor-ruddy.vercel.app",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -26,16 +28,69 @@ app.include_router(auth.router)
 app.include_router(laptops.router)
 app.include_router(ranking.router)
 
+def perform_calculation(request: ranking_schemas.ComparisonRequest, db: Session):
+    from app.services.ahp import calculate_ahp, CRITERIA
+    from app.services.topsis import calculate_topsis
+    import numpy as np
+
+    # 1. Fetch laptops
+    laptops = db.query(models.Laptop).all()
+    if not laptops:
+        return None
+
+    # 2. Build decision matrix
+    matrix_data = []
+    for laptop in laptops:
+        matrix_data.append([
+            laptop.performance,
+            laptop.resolution,
+            laptop.capacity,
+            laptop.portability,
+            laptop.battery,
+            laptop.price
+        ])
+    
+    X = np.array(matrix_data, dtype=float)
+    
+    # 3. Calculate AHP Weights
+    weights, cr = calculate_ahp(request.comparisons)
+    
+    # 4. Apply TOPSIS
+    scores = calculate_topsis(weights, X)
+    
+    # 5. Format results
+    results = []
+    for i in range(len(laptops)):
+        results.append({
+            "name": laptops[i].name,
+            "score": float(scores[i]),
+            "performance": float(laptops[i].performance),
+            "resolution": float(laptops[i].resolution),
+            "capacity": float(laptops[i].capacity),
+            "portability": float(laptops[i].portability),
+            "battery": float(laptops[i].battery),
+            "price": float(laptops[i].price)
+        })
+    
+    results.sort(key=lambda x: x["score"], reverse=True)
+    
+    return {
+        "weights": {CRITERIA[i]: float(weights[i]) for i in range(len(CRITERIA))},
+        "cr": float(cr),
+        "ranking": results
+    }
+
 # Compatibility routes for the current frontend (no auth required)
 @app.post("/calculate", response_model=ranking_schemas.RankingResponse, tags=["compatibility"])
 def legacy_calculate(
     request: ranking_schemas.ComparisonRequest,
     db: Session = Depends(database.get_db)
 ):
-    from app.routers.ranking import calculate_ranking
-    # We call the same logic but without requiring current_user
-    # Note: In a real production app, you might want to still require a user or rate limit
-    return calculate_ranking(request, db, current_user=None)
+    result = perform_calculation(request, db)
+    if result is None:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="No laptops found")
+    return result
 
 @app.get("/laptops-list", tags=["compatibility"])
 def legacy_get_laptops(db: Session = Depends(database.get_db)):

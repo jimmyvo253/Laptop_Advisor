@@ -16,54 +16,11 @@ def calculate_ranking(
     db: Session = Depends(database.get_db),
     current_user: Optional[models.User] = Depends(security.get_current_user)
 ):
-    # 1. Fetch laptops from DB
-    laptops = db.query(models.Laptop).all()
-    if not laptops:
+    from app.main import perform_calculation
+    result = perform_calculation(request, db)
+    if result is None:
         raise HTTPException(status_code=400, detail="No laptops found in database")
-    
-    # 2. Build decision matrix dynamically
-    # Criteria: [Performance, Resolution, Capacity, Portability, Battery, Price]
-    matrix_data = []
-    for laptop in laptops:
-        matrix_data.append([
-            laptop.performance,
-            laptop.resolution,
-            laptop.capacity,
-            laptop.portability,
-            laptop.battery,
-            laptop.price
-        ])
-    
-    X = np.array(matrix_data, dtype=float)
-    
-    # 3. Calculate AHP Weights
-    weights, cr = calculate_ahp(request.comparisons)
-    
-    # 4. Apply TOPSIS
-    scores = calculate_topsis(weights, X)
-    
-    # 5. Format results
-    results = []
-    for i in range(len(laptops)):
-        results.append({
-            "name": laptops[i].name,
-            "score": float(scores[i]),
-            "performance": laptops[i].performance,
-            "resolution": laptops[i].resolution,
-            "capacity": laptops[i].capacity,
-            "portability": laptops[i].portability,
-            "battery": laptops[i].battery,
-            "price": laptops[i].price
-        })
-    
-    # Sort by score descending
-    results.sort(key=lambda x: x["score"], reverse=True)
-    
-    return {
-        "weights": {CRITERIA[i]: float(weights[i]) for i in range(len(CRITERIA))},
-        "cr": float(cr),
-        "ranking": results
-    }
+    return result
 
 @router.get("/criteria")
 def get_criteria():
