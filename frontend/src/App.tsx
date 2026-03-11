@@ -274,13 +274,17 @@ function ComparisonTool() {
                         <tr key={item.name}>
                           <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{overallIdx + 1}</td>
                           <td style={{ fontWeight: '600' }}>{item.name}</td>
-                          {CRITERIA.map(c => (
-                            <td key={c}>
-                              {c.toLowerCase() === 'price' 
-                                ? (item[c.toLowerCase() as keyof typeof item] as number).toLocaleString() 
-                                : (item[c.toLowerCase() as keyof typeof item] as number)}
-                            </td>
-                          ))}
+                          {CRITERIA.map(c => {
+                            const key = c.toLowerCase() as keyof typeof item;
+                            const val = item[key];
+                            return (
+                              <td key={c}>
+                                {c.toLowerCase() === 'price' 
+                                  ? (val !== undefined ? (val as number).toLocaleString() : '0')
+                                  : (val !== undefined ? val : 'N/A')}
+                              </td>
+                            );
+                          })}
                           <td style={{ fontWeight: 'bold', color: '#4f46e5' }}>{(item.score * 100).toFixed(1)}%</td>
                         </tr>
                       );
