@@ -32,6 +32,12 @@ export interface LoginResponse {
 export interface RankingResult {
   name: string;
   score: number;
+  performance: number;
+  resolution: number;
+  capacity: number;
+  portability: number;
+  battery: number;
+  price: number;
 }
 
 export interface RankingResponse {

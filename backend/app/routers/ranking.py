@@ -47,7 +47,13 @@ def calculate_ranking(
     for i in range(len(laptops)):
         results.append({
             "name": laptops[i].name,
-            "score": float(scores[i])
+            "score": float(scores[i]),
+            "performance": laptops[i].performance,
+            "resolution": laptops[i].resolution,
+            "capacity": laptops[i].capacity,
+            "portability": laptops[i].portability,
+            "battery": laptops[i].battery,
+            "price": laptops[i].price
         })
     
     # Sort by score descending

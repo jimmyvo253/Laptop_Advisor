@@ -46,6 +46,8 @@ function ComparisonTool() {
   const [step, setStep] = useState(0); 
   const [activePair, setActivePair] = useState<[number, number] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   const updateMatrixValue = (i: number, j: number, val: number) => {
     const newMatrix = matrix.map(row => [...row]);
@@ -69,6 +71,7 @@ function ComparisonTool() {
         comparisons: flattened
       });
       setResults(response.data);
+      setCurrentPage(1);
       setStep(2);
     } catch (error) {
       console.error("Error calculating:", error);
@@ -186,18 +189,42 @@ function ComparisonTool() {
           <div className="card ranking-card">
             <h2>Recommended Laptops</h2>
             <div className="ranking-list">
-              {results.ranking.map((item, idx) => (
-                <div key={item.name} className="ranking-item">
-                  <div className="rank">#{idx + 1}</div>
-                  <div className="laptop-info">
-                    <span className="laptop-name">{item.name}</span>
-                    <div className="score-bar">
-                      <div className="score-fill" style={{ width: `${item.score * 100}%` }}></div>
+              {results.ranking
+                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                .map((item) => {
+                  const overallIdx = results.ranking.findIndex(r => r.name === item.name);
+                  return (
+                    <div key={item.name} className="ranking-item">
+                      <div className="rank">#{overallIdx + 1}</div>
+                      <div className="laptop-info">
+                        <span className="laptop-name">{item.name}</span>
+                        <div className="score-bar">
+                          <div className="score-fill" style={{ width: `${item.score * 100}%` }}></div>
+                        </div>
+                      </div>
+                      <div className="score-val">{(item.score * 100).toFixed(1)}%</div>
                     </div>
-                  </div>
-                  <div className="score-val">{(item.score * 100).toFixed(1)}%</div>
-                </div>
-              ))}
+                  );
+                })}
+            </div>
+            <div className="pagination" style={{ borderTop: 'none', marginTop: '1rem' }}>
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Prev
+              </button>
+              <div className="page-info" style={{ fontSize: '0.75rem' }}>
+                {currentPage} / {Math.ceil(results.ranking.length / pageSize)}
+              </div>
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(results.ranking.length / pageSize)))}
+                disabled={currentPage === Math.ceil(results.ranking.length / pageSize)}
+              >
+                Next
+              </button>
             </div>
           </div>
 
@@ -223,6 +250,63 @@ function ComparisonTool() {
               </p>
               <small>{results.cr < 0.1 ? "Valid consistency." : "Consider reviewing your comparisons."}</small>
               <button className="secondary-btn" style={{marginTop: '1rem'}} onClick={() => setStep(1)}>Edit Matrix</button>
+            </div>
+          </div>
+
+          <div className="card full-width-card" style={{ marginTop: '2rem' }}>
+            <h3>Detailed Comparison Table</h3>
+            <div className="table-wrapper">
+              <table className="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Laptop Name</th>
+                    {CRITERIA.map(c => <th key={c}>{c}</th>)}
+                    <th>Final Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.ranking
+                    .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                    .map((item) => {
+                      const overallIdx = results.ranking.findIndex(r => r.name === item.name);
+                      return (
+                        <tr key={item.name}>
+                          <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{overallIdx + 1}</td>
+                          <td style={{ fontWeight: '600' }}>{item.name}</td>
+                          {CRITERIA.map(c => (
+                            <td key={c}>
+                              {c.toLowerCase() === 'price' 
+                                ? (item[c.toLowerCase() as keyof typeof item] as number).toLocaleString() 
+                                : (item[c.toLowerCase() as keyof typeof item] as number)}
+                            </td>
+                          ))}
+                          <td style={{ fontWeight: 'bold', color: '#4f46e5' }}>{(item.score * 100).toFixed(1)}%</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="pagination">
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <div className="page-info">
+                Page {currentPage} of {Math.ceil(results.ranking.length / pageSize)}
+              </div>
+              <button 
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(results.ranking.length / pageSize)))}
+                disabled={currentPage === Math.ceil(results.ranking.length / pageSize)}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

@@ -7,6 +7,12 @@ class ComparisonRequest(BaseModel):
 class LaptopScore(BaseModel):
     name: str
     score: float
+    performance: float
+    resolution: float
+    capacity: float
+    portability: float
+    battery: float
+    price: float
 
 class RankingResponse(BaseModel):
     weights: Dict[str, float]
