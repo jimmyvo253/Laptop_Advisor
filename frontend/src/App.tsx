@@ -269,24 +269,19 @@ function ComparisonTool() {
                   {results.ranking
                     .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                     .map((item) => {
-                      const overallIdx = results.ranking.findIndex(r => r.name === item.name);
+                      // Get original rank from the full results
+                      const originalRank = results.ranking.findIndex(r => r.name === item.name) + 1;
+                      
                       return (
                         <tr key={item.name}>
-                          <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{overallIdx + 1}</td>
+                          <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{originalRank}</td>
                           <td style={{ fontWeight: '600' }}>{item.name}</td>
-                          {CRITERIA.map(c => {
-                            // Find the value in the 'item' object regardless of capitalization
-                            const key = c.toLowerCase() as keyof typeof item;
-                            const val = item[key];
-                            
-                            return (
-                              <td key={c}>
-                                {c.toLowerCase() === 'price' 
-                                  ? (val !== undefined ? Number(val).toLocaleString() : '0')
-                                  : (val !== undefined ? String(val) : 'N/A')}
-                              </td>
-                            );
-                          })}
+                          <td>{item.performance}</td>
+                          <td>{item.resolution}</td>
+                          <td>{item.capacity}</td>
+                          <td>{item.portability}</td>
+                          <td>{item.battery}</td>
+                          <td>{Number(item.price).toLocaleString()}</td>
                           <td style={{ fontWeight: 'bold', color: '#4f46e5' }}>{(item.score * 100).toFixed(1)}%</td>
                         </tr>
                       );
