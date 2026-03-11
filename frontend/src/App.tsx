@@ -275,13 +275,15 @@ function ComparisonTool() {
                           <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{overallIdx + 1}</td>
                           <td style={{ fontWeight: '600' }}>{item.name}</td>
                           {CRITERIA.map(c => {
+                            // Find the value in the 'item' object regardless of capitalization
                             const key = c.toLowerCase() as keyof typeof item;
                             const val = item[key];
+                            
                             return (
                               <td key={c}>
                                 {c.toLowerCase() === 'price' 
-                                  ? (val !== undefined ? (val as number).toLocaleString() : '0')
-                                  : (val !== undefined ? val : 'N/A')}
+                                  ? (val !== undefined ? Number(val).toLocaleString() : '0')
+                                  : (val !== undefined ? String(val) : 'N/A')}
                               </td>
                             );
                           })}
