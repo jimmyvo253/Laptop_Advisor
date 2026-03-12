@@ -100,7 +100,7 @@ def legacy_get_laptops(db: Session = Depends(database.get_db)):
 
 from sqlalchemy import text
 
-@app.get("/health", tags=["system"])
+@app.get("/health", methods=["GET", "HEAD"], tags=["system"])
 def health_check(db: Session = Depends(database.get_db)):
     """
     Health check endpoint for monitoring services like UptimeRobot.
@@ -121,6 +121,11 @@ def health_check(db: Session = Depends(database.get_db)):
             status_code=503,
             media_type="application/json"
         )
+
+@app.get("/ping", tags=["system"])
+def ping():
+    """Ultra-fast endpoint for keeping the server awake."""
+    return {"status": "ok"}
 
 @app.get("/")
 def read_root():
