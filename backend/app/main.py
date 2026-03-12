@@ -97,6 +97,30 @@ def legacy_get_laptops(db: Session = Depends(database.get_db)):
     laptops = db.query(models.Laptop).all()
     return [l.name for l in laptops]
 
+from sqlalchemy import text
+
+@app.get("/health", tags=["system"])
+def health_check(db: Session = Depends(database.get_db)):
+    """
+    Health check endpoint for monitoring services like UptimeRobot.
+    Verifies that the API is up and the database is reachable.
+    """
+    try:
+        # Execute a simple query to verify database connectivity
+        db.execute(text("SELECT 1"))
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "message": "AHP-TOPSIS API is fully operational"
+        }
+    except Exception as e:
+        from fastapi import Response
+        return Response(
+            content=f'{{"status": "unhealthy", "error": "{str(e)}"}}',
+            status_code=503,
+            media_type="application/json"
+        )
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to AHP TOPSIS Ranking API"}
