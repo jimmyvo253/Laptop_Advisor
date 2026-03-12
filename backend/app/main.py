@@ -100,7 +100,7 @@ def legacy_get_laptops(db: Session = Depends(database.get_db)):
 
 from sqlalchemy import text
 
-@app.get("/health", methods=["GET", "HEAD"], tags=["system"])
+@app.get("/health", tags=["system"])
 def health_check(db: Session = Depends(database.get_db)):
     """
     Health check endpoint for monitoring services like UptimeRobot.
