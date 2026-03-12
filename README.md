@@ -2,6 +2,15 @@
 
 A decision support system that uses the **Analytic Hierarchy Process (AHP)** and **TOPSIS** (Technique for Order of Preference by Similarity to Ideal Solution) to help users choose the best laptop based on multiple criteria (Performance, Resolution, Capacity, Portability, Battery, Price).
 
+## 👥 Project Members
+
+| Name | Student ID |
+|------|------------|
+| Pham Duc Manh | 10422047 |
+| Vo Tan Sang | 10422114 |
+| Tran Si Nguyen | 10422057 |
+| Nguyen Thanh Son | 10422072 |
+
 ## 🚀 Features
 
 - **AHP Algorithm:** Weighs criteria using pairwise comparisons.
